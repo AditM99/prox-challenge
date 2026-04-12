@@ -1,5 +1,3 @@
-import fs from "fs";
-import path from "path";
 import type {
   TextChunk,
   ImageCatalogEntry,
@@ -10,47 +8,27 @@ import type {
 } from "./types";
 import { semanticSearch } from "./semantic-search";
 
-const KNOWLEDGE_DIR = path.join(process.cwd(), "knowledge");
-
-let textChunks: TextChunk[] | null = null;
-let imageCatalog: ImageCatalogEntry[] | null = null;
-let selectionChartData: SelectionChartEntry[] | null = null;
-let dutyCycleData: DutyCycleEntry[] | null = null;
-
-function loadJSON<T>(filename: string): T {
-  const filePath = path.join(KNOWLEDGE_DIR, filename);
-  const raw = fs.readFileSync(filePath, "utf-8");
-  return JSON.parse(raw) as T;
-}
+// Import JSON directly so webpack bundles them into serverless functions (works on Vercel)
+import textChunksData from "../../knowledge/text-chunks.json";
+import imageCatalogData from "../../knowledge/image-catalog.json";
+import selectionChartDataRaw from "../../knowledge/selection-chart-data.json";
+import dutyCycleDataRaw from "../../knowledge/duty-cycles.json";
+import troubleshootingIndexData from "../../knowledge/troubleshooting/index.json";
 
 export function getTextChunks(): TextChunk[] {
-  if (!textChunks) {
-    textChunks = loadJSON<TextChunk[]>("text-chunks.json");
-  }
-  return textChunks;
+  return textChunksData as TextChunk[];
 }
 
 export function getImageCatalog(): ImageCatalogEntry[] {
-  if (!imageCatalog) {
-    imageCatalog = loadJSON<ImageCatalogEntry[]>("image-catalog.json");
-  }
-  return imageCatalog;
+  return imageCatalogData as ImageCatalogEntry[];
 }
 
 export function getSelectionChartData(): SelectionChartEntry[] {
-  if (!selectionChartData) {
-    selectionChartData = loadJSON<SelectionChartEntry[]>(
-      "selection-chart-data.json"
-    );
-  }
-  return selectionChartData;
+  return selectionChartDataRaw as SelectionChartEntry[];
 }
 
 export function getDutyCycleData(): DutyCycleEntry[] {
-  if (!dutyCycleData) {
-    dutyCycleData = loadJSON<DutyCycleEntry[]>("duty-cycles.json");
-  }
-  return dutyCycleData;
+  return dutyCycleDataRaw as DutyCycleEntry[];
 }
 
 export async function searchTextChunks(
@@ -137,23 +115,24 @@ export function queryDutyCycles(
 
 // ─── Troubleshooting ───
 
-let troubleshootingIndex: TroubleshootingIndexEntry[] | null = null;
+import porosityFlow from "../../knowledge/troubleshooting/porosity.json";
+import wireFeedFlow from "../../knowledge/troubleshooting/wire-feed-issues.json";
+import noArcFlow from "../../knowledge/troubleshooting/no-arc.json";
+import spatterFlow from "../../knowledge/troubleshooting/spatter.json";
+
+const troubleshootingFlows: Record<string, TroubleshootingFlow> = {
+  porosity: porosityFlow as unknown as TroubleshootingFlow,
+  "wire-feed-issues": wireFeedFlow as unknown as TroubleshootingFlow,
+  "no-arc": noArcFlow as unknown as TroubleshootingFlow,
+  spatter: spatterFlow as unknown as TroubleshootingFlow,
+};
 
 export function getTroubleshootingIndex(): TroubleshootingIndexEntry[] {
-  if (!troubleshootingIndex) {
-    troubleshootingIndex = loadJSON<TroubleshootingIndexEntry[]>(
-      "troubleshooting/index.json"
-    );
-  }
-  return troubleshootingIndex;
+  return troubleshootingIndexData as TroubleshootingIndexEntry[];
 }
 
 export function getTroubleshootingFlow(id: string): TroubleshootingFlow | null {
-  try {
-    return loadJSON<TroubleshootingFlow>(`troubleshooting/${id}.json`);
-  } catch {
-    return null;
-  }
+  return troubleshootingFlows[id] || null;
 }
 
 export function findTroubleshootingFlow(query: string): TroubleshootingFlow | null {
