@@ -18,10 +18,6 @@ The only required environment variable is `ANTHROPIC_API_KEY`.
 
 ## How It Works
 
-### The Problem
-
-The Vulcan OmniPro 220 manual is 48 pages of dense technical content — duty cycle matrices, polarity procedures that differ per welding process, wire feed calibrations, wiring schematics, troubleshooting matrices. Nobody reads this front-to-back. Users need specific answers to specific questions, fast.
-
 ### Architecture Overview
 
 ```
@@ -42,8 +38,8 @@ User Question
               ▼              ▼              ▼
         ┌──────────┐  ┌──────────┐  ┌──────────┐
         │ search   │  │ show     │  │ render   │
-        │ _manual  │  │ _manual  │  │ _artifact│
-        │          │  │ _image   │  │          │
+        │ manual  │  │  manual  │  │  artifact│
+        │          │  │ image   │  │          │
         └────┬─────┘  └──────────┘  └──────────┘
              │
      ┌───────▼───────┐
@@ -61,12 +57,12 @@ The system streams responses via Server-Sent Events (SSE). Claude calls tools as
 
 The 48-page PDF is pre-processed into four structured knowledge layers:
 
-| Layer | File | What it contains |
-|-------|------|-----------------|
-| **Text chunks** | `knowledge/text-chunks.json` | Every page split into semantic sections with keywords extracted per chunk |
-| **Image catalog** | `knowledge/image-catalog.json` | Manual images tagged with descriptions and searchable metadata (polarity diagrams, weld quality photos, schematics) |
-| **Selection charts** | `knowledge/selection-chart-data.json` | Structured welding parameter data — process, material, thickness → wire, gas, voltage, wire speed |
-| **Duty cycles** | `knowledge/duty-cycles.json` | Structured duty cycle matrices — process, input voltage → rated amps, duty cycle %, continuous amps |
+| Layer                | File                                  | What it contains                                                                                                    |
+| -------------------- | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| **Text chunks**      | `knowledge/text-chunks.json`          | Every page split into semantic sections with keywords extracted per chunk                                           |
+| **Image catalog**    | `knowledge/image-catalog.json`        | Manual images tagged with descriptions and searchable metadata (polarity diagrams, weld quality photos, schematics) |
+| **Selection charts** | `knowledge/selection-chart-data.json` | Structured welding parameter data — process, material, thickness → wire, gas, voltage, wire speed                   |
+| **Duty cycles**      | `knowledge/duty-cycles.json`          | Structured duty cycle matrices — process, input voltage → rated amps, duty cycle %, continuous amps                 |
 
 Pre-processing runs once via `npm run prepare-knowledge`. The structured data means Claude doesn't have to parse tables from raw PDF text at query time — it gets clean, queryable data.
 
@@ -122,6 +118,7 @@ The grep search itself is non-trivial — it supports quoted phrase matching, st
 When a text answer isn't enough, Claude generates self-contained React components that render in a sandboxed iframe. The sandbox provides React 18, Tailwind CSS, and Lucide icons — no build step required. Claude's code is compiled at runtime via Babel Standalone.
 
 Examples of what the agent generates:
+
 - **Polarity questions** → SVG connection diagram with material selector (Steel vs Aluminum toggles change the displayed wiring)
 - **Settings questions** → Interactive configurator with dropdowns for process, material, thickness
 - **Duty cycle questions** → Visual calculator showing weld/rest times
@@ -139,16 +136,16 @@ The agent can surface specific images from the manual — polarity diagrams, wel
 
 ## Tools Available to the Agent
 
-| Tool | Purpose |
-|------|---------|
-| `search_manual` | 2-stage retrieval against the knowledge base |
-| `show_manual_image` | Surface tagged manual images |
-| `get_selection_chart_data` | Query structured welding parameters |
-| `get_duty_cycle_data` | Query structured duty cycle data |
-| `render_artifact` | Generate interactive React/SVG/HTML components |
-| `guided_troubleshoot` | Launch interactive diagnostic flowcharts |
-| `web_search` | Search the web for info not in the manual |
-| `update_user_memory` | Persist user preferences across conversations |
+| Tool                       | Purpose                                        |
+| -------------------------- | ---------------------------------------------- |
+| `search_manual`            | 2-stage retrieval against the knowledge base   |
+| `show_manual_image`        | Surface tagged manual images                   |
+| `get_selection_chart_data` | Query structured welding parameters            |
+| `get_duty_cycle_data`      | Query structured duty cycle data               |
+| `render_artifact`          | Generate interactive React/SVG/HTML components |
+| `guided_troubleshoot`      | Launch interactive diagnostic flowcharts       |
+| `web_search`               | Search the web for info not in the manual      |
+| `update_user_memory`       | Persist user preferences across conversations  |
 
 ## Beyond the Vulcan: Any Product Manual
 
@@ -169,6 +166,7 @@ Uploaded products get the same tool suite (search, artifacts, troubleshooting, w
 ## User Memory
 
 The agent learns about users across conversations:
+
 - **Expertise level** — adjusts language complexity (beginner gets jargon explained, expert gets concise technical answers)
 - **Preferred detail level** — concise vs thorough
 - **Frequent topics** — personalizes suggestions
@@ -178,16 +176,16 @@ Memory persists in the browser via localStorage.
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Framework | Next.js 14 (App Router) |
-| AI | Claude Sonnet 4 via Vercel AI SDK (`@ai-sdk/anthropic`) |
-| Streaming | Server-Sent Events (SSE) |
-| Artifacts | Sandboxed iframe + Babel Standalone + React 18 UMD |
-| Styling | Tailwind CSS |
-| PDF Processing | `pdf-parse` (server), `pdfjs-dist` (client viewer) |
-| Web Scraping | `cheerio` for HTML extraction |
-| Voice | Web Speech API (Recognition + Synthesis) |
+| Layer          | Technology                                              |
+| -------------- | ------------------------------------------------------- |
+| Framework      | Next.js 14 (App Router)                                 |
+| AI             | Claude Sonnet 4 via Vercel AI SDK (`@ai-sdk/anthropic`) |
+| Streaming      | Server-Sent Events (SSE)                                |
+| Artifacts      | Sandboxed iframe + Babel Standalone + React 18 UMD      |
+| Styling        | Tailwind CSS                                            |
+| PDF Processing | `pdf-parse` (server), `pdfjs-dist` (client viewer)      |
+| Web Scraping   | `cheerio` for HTML extraction                           |
+| Voice          | Web Speech API (Recognition + Synthesis)                |
 
 ## Project Structure
 
