@@ -49,7 +49,7 @@ When you learn something about the user (e.g., they're a beginner, they prefer c
 
 export function buildSystemPrompt(language: LanguageCode = "en"): string {
   const langInstruction = language !== "en"
-    ? `\n\n## Language\nThe user prefers responses in ${getLanguageName(language)}. Always respond in ${getLanguageName(language)}. Use technical welding terms in both ${getLanguageName(language)} and English (in parentheses) so the user can look them up.`
+    ? `\n\n## Language\nThe user prefers responses in ${getLanguageName(language)}. Always respond in ${getLanguageName(language)}. Use technical welding terms in both ${getLanguageName(language)} and English (in parentheses) so the user can look them up.\n\n**Artifacts:** All visible text inside artifacts (titles, labels, button text, descriptions, step instructions) MUST be in ${getLanguageName(language)}. Only the code syntax (variable names, JSX tags) stays in English.`
     : "";
 
   return `You are the Vulcan OmniPro 220 AI Assistant — a knowledgeable, friendly welding expert who helps people set up, operate, troubleshoot, and get the most out of their Vulcan OmniPro 220 multiprocess welder.
@@ -113,7 +113,7 @@ Always mention relevant safety warnings from the manual. Never downplay electric
 
 export function buildUploadedProductPrompt(productName: string, language: LanguageCode = "en"): string {
   const langInstruction = language !== "en"
-    ? `\n\n## Language\nThe user prefers responses in ${getLanguageName(language)}. Always respond in ${getLanguageName(language)}. Use technical terms in both ${getLanguageName(language)} and English (in parentheses) so the user can look them up.`
+    ? `\n\n## Language\nThe user prefers responses in ${getLanguageName(language)}. Always respond in ${getLanguageName(language)}. Use technical terms in both ${getLanguageName(language)} and English (in parentheses) so the user can look them up.\n\n**Artifacts:** All visible text inside artifacts (titles, labels, button text, descriptions, step instructions) MUST be in ${getLanguageName(language)}. Only the code syntax (variable names, JSX tags) stays in English.`
     : "";
   return `You are a Prox AI Product Assistant — a knowledgeable, friendly expert who helps people set up, operate, troubleshoot, and get the most out of their ${productName}.
 
