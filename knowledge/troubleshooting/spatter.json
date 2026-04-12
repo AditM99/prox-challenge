@@ -1,0 +1,106 @@
+{
+  "id": "spatter",
+  "title": "Excessive Spatter",
+  "description": "Diagnose and reduce excessive spatter during welding",
+  "steps": {
+    "start": {
+      "question": "Which welding process are you using?",
+      "options": [
+        { "label": "MIG (solid wire)", "next": "mig_spatter" },
+        { "label": "Flux-Cored", "next": "fc_spatter" },
+        { "label": "Stick", "next": "stick_spatter" }
+      ]
+    },
+    "mig_spatter": {
+      "question": "How would you describe the spatter?",
+      "options": [
+        { "label": "Large irregular balls of spatter", "next": "mig_voltage_low" },
+        { "label": "Fine spray of tiny spatter everywhere", "next": "mig_voltage_high" },
+        { "label": "Spatter mostly at arc start/stop", "next": "mig_start_stop" }
+      ]
+    },
+    "mig_voltage_low": {
+      "type": "resolution",
+      "title": "Voltage Too Low for Wire Speed",
+      "fix": "1. Large spatter balls usually mean voltage is too low relative to wire speed.\n2. Increase voltage by 1-2 settings and test.\n3. Use the selection chart to find the recommended voltage for your wire speed.\n4. You should hear a steady \"sizzling bacon\" sound — not loud pops.\n5. Also check that your gas flow is adequate (20-25 CFH).",
+      "reference": "See manual Selection Chart"
+    },
+    "mig_voltage_high": {
+      "type": "resolution",
+      "title": "Voltage Too High",
+      "fix": "1. Fine spray spatter often means voltage is too high for the wire speed.\n2. Decrease voltage by 1-2 settings.\n3. Or increase wire feed speed to match the higher voltage.\n4. Check stickout — keep it at 3/8\" to 1/2\".\n5. Excessive stickout increases resistance and creates more spatter.",
+      "reference": "See manual Selection Chart"
+    },
+    "mig_start_stop": {
+      "question": "Check your technique at arc start.",
+      "options": [
+        { "label": "I start far from the workpiece", "next": "fix_start_technique" },
+        { "label": "I have the right distance", "next": "mig_gas_type" }
+      ]
+    },
+    "fix_start_technique": {
+      "type": "resolution",
+      "title": "Improve Arc Start Technique",
+      "fix": "1. Position the nozzle close to the workpiece before pulling the trigger.\n2. Start with the wire almost touching the work surface.\n3. Use a slight push or drag angle (15-20°) from the start.\n4. Don't wave the gun around at arc start — hold steady.\n5. Some spatter at start/stop is normal; anti-spatter spray helps with cleanup.",
+      "reference": "See manual page 28 — MIG Technique"
+    },
+    "mig_gas_type": {
+      "type": "resolution",
+      "title": "Check Shielding Gas Mixture",
+      "fix": "1. 100% CO2 produces significantly more spatter than argon mixes.\n2. Switch to 75% Argon / 25% CO2 for much less spatter on mild steel.\n3. 90% Argon / 10% CO2 gives even cleaner welds but less penetration.\n4. For aluminum, use 100% Argon.\n5. Verify gas flow: too little = porosity and spatter; too much = turbulence and spatter.\n6. Optimal flow: 20-25 CFH for most MIG work.",
+      "reference": "See manual page 23 — Shielding Gas"
+    },
+    "fc_spatter": {
+      "question": "What type of flux-cored wire are you using?",
+      "options": [
+        { "label": "Self-shielded (E71T-11)", "next": "fc_self_spatter" },
+        { "label": "Gas-shielded (E71T-1)", "next": "fc_gas_spatter" },
+        { "label": "Not sure", "next": "fc_check_polarity" }
+      ]
+    },
+    "fc_self_spatter": {
+      "type": "resolution",
+      "title": "Self-Shielded Flux-Core Spatter",
+      "fix": "1. Some spatter is normal with self-shielded flux-cored wire — it's inherently more spattery.\n2. Use DCEN polarity (electrode negative) — wrong polarity drastically increases spatter.\n3. Use a drag (pull) technique at 15-45° angle.\n4. Don't exceed recommended wire feed speed for the voltage.\n5. Keep stickout at 1/2\" to 3/4\" (longer than MIG).\n6. Use anti-spatter spray on the workpiece and nozzle.",
+      "reference": "See manual page 30 — Flux-Cored Welding"
+    },
+    "fc_gas_spatter": {
+      "type": "resolution",
+      "title": "Gas-Shielded Flux-Core Spatter",
+      "fix": "1. Verify polarity: gas-shielded flux-core uses DCEP (electrode positive).\n2. Check gas flow: 25-30 CFH with 75/25 or 100% CO2.\n3. Reduce voltage if seeing excessive spatter — you may be running too hot.\n4. Maintain proper stickout of 1/2\" to 3/4\".\n5. Use drag technique at 15-45° angle.\n6. Ensure clean base metal — contamination increases spatter.",
+      "reference": "See manual page 30 — Flux-Cored Welding"
+    },
+    "fc_check_polarity": {
+      "type": "resolution",
+      "title": "Check Flux-Core Wire Type and Polarity",
+      "fix": "1. Read the wire spool label for the AWS classification.\n2. E71T-11 (self-shielded) → DCEN polarity, no gas needed.\n3. E71T-1 (gas-shielded) → DCEP polarity, 75/25 or CO2 gas required.\n4. WRONG POLARITY is the #1 cause of excessive spatter with flux-cored wire.\n5. Check your cable connections against the polarity diagram in the manual.",
+      "reference": "See manual page 11 — Polarity Setup"
+    },
+    "stick_spatter": {
+      "question": "What electrode are you using?",
+      "options": [
+        { "label": "6011 or 6010", "next": "stick_6011" },
+        { "label": "7018", "next": "stick_7018" },
+        { "label": "Other / not sure", "next": "stick_general" }
+      ]
+    },
+    "stick_6011": {
+      "type": "resolution",
+      "title": "6011/6010 Electrode Spatter",
+      "fix": "1. 6011 and 6010 are inherently high-spatter electrodes — this is normal.\n2. They're designed for deep penetration and dirty/rusty metal.\n3. Reduce arc length (keep it tight) to minimize spatter.\n4. Use a slight weave or whip technique.\n5. If clean metal is available, consider 7018 for much less spatter.\n6. Anti-spatter spray will help with cleanup.",
+      "reference": "See manual page 34 — Stick Welding"
+    },
+    "stick_7018": {
+      "type": "resolution",
+      "title": "7018 Electrode Spatter",
+      "fix": "1. 7018 should produce minimal spatter — if it's bad, the electrode may be damp.\n2. Store 7018 rods in a rod oven at 250°F — moisture causes porosity and spatter.\n3. Check polarity: 7018 uses DCEP (electrode positive) on the OmniPro.\n4. Keep a short arc length — drag the rod lightly.\n5. If electrodes have been exposed to moisture, bake at 500°F for 1 hour.",
+      "reference": "See manual page 34 — Stick Welding"
+    },
+    "stick_general": {
+      "type": "resolution",
+      "title": "General Stick Welding Spatter Reduction",
+      "fix": "1. Match polarity to your electrode type (check the electrode package).\n2. Keep a short arc length — the shorter the arc, the less spatter.\n3. Use the correct amperage range for your rod diameter.\n4. Check the selection chart for recommended settings.\n5. Ensure a solid work clamp connection.\n6. Consider switching to 7018 for the lowest spatter on clean mild steel.",
+      "reference": "See manual page 34 — Stick Welding"
+    }
+  }
+}

@@ -1,0 +1,58 @@
+[
+  {
+    "process": "MIG",
+    "voltage": "120V",
+    "ratedAmps": 100,
+    "dutyCyclePercent": 40,
+    "continuousAmps": 75
+  },
+  {
+    "process": "MIG",
+    "voltage": "240V",
+    "ratedAmps": 200,
+    "dutyCyclePercent": 25,
+    "continuousAmps": 115
+  },
+  {
+    "process": "Flux-Cored",
+    "voltage": "120V",
+    "ratedAmps": 100,
+    "dutyCyclePercent": 40,
+    "continuousAmps": 75
+  },
+  {
+    "process": "Flux-Cored",
+    "voltage": "240V",
+    "ratedAmps": 200,
+    "dutyCyclePercent": 25,
+    "continuousAmps": 115
+  },
+  {
+    "process": "TIG",
+    "voltage": "120V",
+    "ratedAmps": 125,
+    "dutyCyclePercent": 40,
+    "continuousAmps": 90
+  },
+  {
+    "process": "TIG",
+    "voltage": "240V",
+    "ratedAmps": 175,
+    "dutyCyclePercent": 30,
+    "continuousAmps": 105
+  },
+  {
+    "process": "Stick",
+    "voltage": "120V",
+    "ratedAmps": 80,
+    "dutyCyclePercent": 40,
+    "continuousAmps": 60
+  },
+  {
+    "process": "Stick",
+    "voltage": "240V",
+    "ratedAmps": 175,
+    "dutyCyclePercent": 25,
+    "continuousAmps": 100
+  }
+]

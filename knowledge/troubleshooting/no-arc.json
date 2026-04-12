@@ -1,0 +1,92 @@
+{
+  "id": "no-arc",
+  "title": "No Arc / Machine Won't Weld",
+  "description": "Diagnose why the welding machine produces no arc or won't weld",
+  "steps": {
+    "start": {
+      "question": "What happens when you try to weld?",
+      "options": [
+        { "label": "Machine is completely dead (no lights/display)", "next": "no_power" },
+        { "label": "Machine powers on but nothing happens when I trigger", "next": "power_on_no_output" },
+        { "label": "I hear a click/hum but no arc", "next": "click_no_arc" },
+        { "label": "Arc starts briefly then dies", "next": "arc_dies" }
+      ]
+    },
+    "no_power": {
+      "question": "Check your power supply.",
+      "options": [
+        { "label": "Using 120V outlet", "next": "check_120v" },
+        { "label": "Using 240V outlet", "next": "check_240v" }
+      ]
+    },
+    "check_120v": {
+      "type": "resolution",
+      "title": "No Power on 120V",
+      "fix": "1. Verify the outlet is live — plug in another device to test.\n2. Check that the power cord is fully seated in the machine's inlet.\n3. Check the circuit breaker on the outlet's circuit.\n4. The OmniPro 220 requires a dedicated 20A circuit on 120V.\n5. Don't use extension cords — they cause voltage drop.\n6. Check the machine's internal circuit breaker (reset button on back panel).",
+      "reference": "See manual page 8 — Power Requirements"
+    },
+    "check_240v": {
+      "type": "resolution",
+      "title": "No Power on 240V",
+      "fix": "1. Verify the 240V outlet is energized — test with a multimeter if available.\n2. Check that you're using the correct plug adapter (NEMA 6-50 or 14-50).\n3. Check the breaker on the panel — 240V circuits use double-pole breakers.\n4. Inspect the power cord for damage.\n5. The OmniPro 220 requires a 30A or 50A 240V circuit for full output.\n6. Check the machine's internal circuit breaker (reset button on back panel).",
+      "reference": "See manual page 8 — Power Requirements"
+    },
+    "power_on_no_output": {
+      "question": "Which welding process is selected?",
+      "options": [
+        { "label": "MIG / Flux-Cored", "next": "mig_no_output" },
+        { "label": "Stick / TIG", "next": "stick_tig_no_output" }
+      ]
+    },
+    "mig_no_output": {
+      "question": "Do you hear the wire feed motor when you pull the trigger?",
+      "options": [
+        { "label": "No — motor doesn't run", "next": "mig_trigger_check" },
+        { "label": "Yes — motor runs but no arc", "next": "mig_ground_check" }
+      ]
+    },
+    "mig_trigger_check": {
+      "type": "resolution",
+      "title": "MIG Gun Trigger Not Activating",
+      "fix": "1. Check that the gun connector is fully inserted and locked into the machine.\n2. Verify the correct process is selected (MIG or Flux-Cored, not Stick/TIG).\n3. Try disconnecting and reconnecting the gun.\n4. Check the trigger cable for damage.\n5. If using a spool gun, ensure it's selected in the machine settings.",
+      "reference": "See manual page 10 — Gun Connection"
+    },
+    "mig_ground_check": {
+      "type": "resolution",
+      "title": "MIG — Motor Runs But No Arc",
+      "fix": "1. Check work clamp connection — it must be firmly attached to bare metal.\n2. Remove paint, rust, or coating at the clamp point.\n3. Verify the work clamp cable is plugged into the correct terminal.\n4. Check polarity — MIG solid wire uses DCEP (work clamp to negative terminal).\n5. Make sure the wire is actually reaching the contact tip — remove the nozzle and check.\n6. Replace the contact tip if worn or clogged.",
+      "reference": "See manual page 11 — Polarity & Connections"
+    },
+    "stick_tig_no_output": {
+      "type": "resolution",
+      "title": "Stick/TIG — No Output",
+      "fix": "1. Verify the correct process is selected on the machine (Stick or TIG).\n2. Check that cables are in the correct terminals for your polarity.\n3. For Stick: electrode holder to positive, work clamp to negative (DCEP) for most rods.\n4. For TIG: torch to negative, work clamp to positive (DCEN).\n5. Verify the amperage is set high enough for your electrode/tungsten size.\n6. Check that the work clamp has a good connection to clean metal.\n7. For TIG: ensure the foot pedal or torch trigger is connected and functioning.",
+      "reference": "See manual page 11 — Polarity Setup"
+    },
+    "click_no_arc": {
+      "type": "resolution",
+      "title": "Relay Clicks But No Arc",
+      "fix": "1. The click means the machine is receiving the trigger signal.\n2. Check all cable connections — both output terminals and work clamp.\n3. Verify polarity is correct for your process.\n4. For MIG: check that wire is protruding from the contact tip.\n5. Make sure the workpiece is conductive (not painted, coated, or insulated).\n6. Try increasing the output settings (voltage/amperage).\n7. If all connections are correct, the machine may have an internal issue — contact service.",
+      "reference": "See manual page 38 — Troubleshooting"
+    },
+    "arc_dies": {
+      "question": "How quickly does the arc die?",
+      "options": [
+        { "label": "Immediately (within 1 second)", "next": "arc_immediate_die" },
+        { "label": "After a few seconds of welding", "next": "arc_thermal" }
+      ]
+    },
+    "arc_immediate_die": {
+      "type": "resolution",
+      "title": "Arc Dies Immediately",
+      "fix": "1. Amperage/voltage is too low — increase your settings.\n2. For Stick: use a fast striking motion and pull back slightly once arc starts.\n3. For MIG: increase wire feed speed — the wire is melting faster than it feeds.\n4. Check work clamp connection — intermittent contact causes arc drops.\n5. For TIG: check gas flow — contaminated tungsten extinguishes the arc quickly.",
+      "reference": "See manual Selection Chart for correct settings"
+    },
+    "arc_thermal": {
+      "type": "resolution",
+      "title": "Arc Dies After a Few Seconds — Possible Thermal Overload",
+      "fix": "1. Check the thermal overload indicator on the machine display.\n2. If the machine overheated, wait for the fan to cool it down (10-15 minutes).\n3. You may be exceeding the duty cycle — check the duty cycle chart.\n4. At 120V, the machine has reduced output and lower duty cycle.\n5. Consider switching to 240V for higher duty cycle ratings.\n6. If it's not thermal, check for loose cable connections causing intermittent contact.",
+      "reference": "See manual page 7 — Duty Cycle"
+    }
+  }
+}

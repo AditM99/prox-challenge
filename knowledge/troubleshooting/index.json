@@ -1,0 +1,22 @@
+[
+  {
+    "id": "porosity",
+    "title": "Diagnosing Porosity in Welds",
+    "keywords": ["porosity", "gas", "pockets", "holes", "porous", "bubbles", "pinholes"]
+  },
+  {
+    "id": "wire-feed-issues",
+    "title": "Wire Feed Problems",
+    "keywords": ["wire", "feed", "jamming", "bird", "nest", "birdnest", "stuck", "slipping", "tangling"]
+  },
+  {
+    "id": "no-arc",
+    "title": "No Arc / Machine Won't Weld",
+    "keywords": ["arc", "no arc", "wont weld", "not welding", "no output", "dead", "nothing happens"]
+  },
+  {
+    "id": "spatter",
+    "title": "Excessive Spatter",
+    "keywords": ["spatter", "splatter", "sparks", "messy", "rough", "ugly", "cleanup"]
+  }
+]

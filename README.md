@@ -1,92 +1,250 @@
-# Prox Founding Engineer Challenge
+# Prox AI — Multimodal Product Support Agent
 
 <img src="product.webp" alt="Vulcan OmniPro 220" width="400" /> <img src="product-inside.webp" alt="Vulcan OmniPro 220 — inside panel" width="400" />
 
-## The Product
+A multimodal AI agent that turns dense product manuals into an interactive support experience. Built for the Vulcan OmniPro 220 multiprocess welder, but designed to work with any uploaded product manual.
 
-The [Vulcan OmniPro 220](https://www.harborfreight.com/omnipro-220-industrial-multiprocess-welder-with-120240v-input-57812.html) is a multiprocess welding system sold by Harbor Freight. It supports four welding processes (MIG, Flux-Cored, TIG, and Stick), runs on both 120V and 240V input, and has an LCD-based synergic control system.
-
-Its owner's manual is 48 pages of dense technical content. Duty cycle matrices across multiple voltages and amperages, polarity setup procedures that differ per welding process, wire feed mechanisms with specific tensioner calibrations, wiring schematics, troubleshooting matrices, weld diagnosis diagrams, and a full parts list.
-
-This is exactly the kind of product Prox exists for. Nobody knows how to use this machine straight out of the box but has time to read 48 page manual, but a complicated machine needs expert-level support.
-
-Additional video: https://www.youtube.com/watch?v=kxGDoGcnhBw
-
-## Your Job
-
-Build a multimodal reasoning agent for the Vulcan OmniPro 220 using the Claude Agent SDK. The agent must be able to answer deep technical questions about this product accurately, helpfully, and not just in text.
-
-The manuals are in the `files/` directory.
-
-**There is no limit to how far you can go.** You can integrate voice. You can build a full interactive experience. Sky is the limit. The more ambitious and polished, the better.
-
-## What We're Testing
-
-### 1. Deep Technical Accuracy
-
-Your agent needs to answer questions like these correctly:
-
-- "What's the duty cycle for MIG welding at 200A on 240V?"
-- "I'm getting porosity in my flux-cored welds. What should I check?"
-- "What polarity setup do I need for TIG welding? Which socket does the ground clamp go in?"
-
-We will test with questions that require cross-referencing multiple manual sections, understanding visual content (diagrams, schematics, charts), and handling ambiguous questions that need clarification from the user.
-
-### 2. Multimodal Responses
-
-This is the most important part. Your agent must not be text-only.
-
-- If someone asks about polarity setup, the agent should draw or show a diagram of which cable goes in which socket, not just describe it.
-- If the answer relates to a specific image in the manual (the wire feed mechanism, the front panel controls, the weld diagnosis examples), the agent should surface that image.
-- If a question is complex enough, the agent should generate interactive content: a duty cycle calculator, a troubleshooting flowchart, a settings configurator that takes process + material + thickness and outputs recommended wire speed and voltage.
-
-When something is too cognitively hard to explain in words, the agent should draw it. Real-time diagrams, interactive schematics, visual walkthroughs generated through code.
-
-For your agent to handle these responses well you need to reverse engineer Claude artifacts. Here are two places where you can start:
-- https://claude.ai/artifacts (see how Claude renders interactive artifacts in chat)
-- https://www.reidbarber.com/blog/reverse-engineering-claude-artifacts
-
-### 3. Tone and Helpfulness
-
-Imagine your user just bought this welder and is standing in their garage trying to set it up. They're not an idiot, but they're not a professional welder either.
-
-### 4. Knowledge Extraction Quality
-
-The manual has a mix of text, tables, labeled diagrams, schematics, and decision matrices. Some critical information exists only in images (the welding process selection chart, the weld diagnosis photos, the wiring schematic). We want to see that your agent understands and presents the visual content, not just the text.
-
-## Tech Requirements
-
-- Use the [Anthropic Claude Agent SDK](https://docs.anthropic.com) as the foundation for your agent.
-- The project must run locally with a single API key provided via `.env`.
-- You are responsible for your own API costs during development.
-
-## How to Present Your Work
-
-**This matters.** Your submission is not just the code — it's how you present it.
-
-- **Build a frontend.** The best way for us to evaluate your agent is if it has a clean, simple UI we can run immediately. This is realistically the only way to properly demo an agent like this.
-- **Hosting is a plus.** If you host it somewhere we can access without cloning, that's a strong signal. Not required, but it removes friction and shows initiative.
-- **Write a clear README.** Explain how your agent works, what design decisions you made, how knowledge is extracted and represented, and how to run it. Your documentation will be evaluated — we want to see how you think and communicate, not just how you code.
-- **Video walkthrough is a huge plus.** Record yourself demoing the agent and explaining your approach. Walk through the hard questions, show how it handles multimodal responses, explain your architecture. This gives us a much richer picture of your work than code alone.
-
-We should be running your agent within 2 minutes of cloning your repo:
+## Quick Start
 
 ```bash
 git clone <your-fork>
-cd <your-fork>
-cp .env.example .env   # we plug in our own Anthropic API key
-# your install command (npm install, uv install, etc.)
-# your run command (npm run dev, python app.py, etc.)
+cd prox-challenge
+cp .env.example .env        # Add your ANTHROPIC_API_KEY
+npm install
+npm run dev                  # → http://localhost:3000
 ```
 
-If it takes longer than that to set up, that's a problem.
+The only required environment variable is `ANTHROPIC_API_KEY`.
 
-## What to Submit
+## How It Works
 
-1. Fork this repo.
-2. Build your solution.
-3. Submit your fork URL through the form at [useprox.com/join/challenge](https://useprox.com/join/challenge).
+### The Problem
 
-## What Happens Next
+The Vulcan OmniPro 220 manual is 48 pages of dense technical content — duty cycle matrices, polarity procedures that differ per welding process, wire feed calibrations, wiring schematics, troubleshooting matrices. Nobody reads this front-to-back. Users need specific answers to specific questions, fast.
 
-We review submissions on a rolling basis and respond to every single one within a few days. Good luck.
+### Architecture Overview
+
+```
+User Question
+     │
+     ▼
+┌─────────────┐     ┌──────────────────┐
+│  Next.js UI │────▶│  /api/chat       │
+│  (React 18) │◀────│  (SSE stream)    │
+└─────────────┘     └────────┬─────────┘
+                             │
+                    ┌────────▼─────────┐
+                    │  Claude Sonnet 4 │
+                    │  (Vercel AI SDK) │
+                    └────────┬─────────┘
+                             │
+              ┌──────────────┼──────────────┐
+              ▼              ▼              ▼
+        ┌──────────┐  ┌──────────┐  ┌──────────┐
+        │ search   │  │ show     │  │ render   │
+        │ _manual  │  │ _manual  │  │ _artifact│
+        │          │  │ _image   │  │          │
+        └────┬─────┘  └──────────┘  └──────────┘
+             │
+     ┌───────▼───────┐
+     │  2-Stage      │
+     │  Retrieval    │
+     │  grep → TF-IDF│
+     └───────────────┘
+```
+
+The system streams responses via Server-Sent Events (SSE). Claude calls tools as it reasons, and each tool result (text, images, artifacts) is emitted as a separate SSE event. The frontend renders them in real-time — text streams in, images appear as they're found, artifacts render in sandboxed iframes.
+
+## Knowledge Extraction & Representation
+
+### How the Manual Becomes Searchable
+
+The 48-page PDF is pre-processed into four structured knowledge layers:
+
+| Layer | File | What it contains |
+|-------|------|-----------------|
+| **Text chunks** | `knowledge/text-chunks.json` | Every page split into semantic sections with keywords extracted per chunk |
+| **Image catalog** | `knowledge/image-catalog.json` | Manual images tagged with descriptions and searchable metadata (polarity diagrams, weld quality photos, schematics) |
+| **Selection charts** | `knowledge/selection-chart-data.json` | Structured welding parameter data — process, material, thickness → wire, gas, voltage, wire speed |
+| **Duty cycles** | `knowledge/duty-cycles.json` | Structured duty cycle matrices — process, input voltage → rated amps, duty cycle %, continuous amps |
+
+Pre-processing runs once via `npm run prepare-knowledge`. The structured data means Claude doesn't have to parse tables from raw PDF text at query time — it gets clean, queryable data.
+
+### Why This Structure
+
+Separating structured data (selection charts, duty cycles) from free text was a deliberate choice. When someone asks "What settings for 1/8 inch mild steel MIG?", the agent queries the selection chart directly and gets exact numbers. If that same data lived in a text chunk, the model would have to extract values from prose — slower, less reliable, and prone to hallucination.
+
+The image catalog with semantic tags means the agent can find "the polarity diagram for TIG" without doing image recognition at query time. The tags were created during knowledge preparation, not at runtime.
+
+## 2-Stage Retrieval: Grep → TF-IDF Rerank
+
+This was the most important design decision. Pure keyword search misses conversational queries ("how do I fix spatter" won't match "excessive spatter can be reduced by adjusting voltage"). But embedding-based search adds latency, cost, and an external API dependency.
+
+The solution is a two-stage pipeline that runs entirely in-process:
+
+```
+Query: "how do I fix spatter"
+         │
+         ▼
+┌─────────────────────────┐
+│  Stage 1: Grep Search   │
+│  Regex + keyword match  │
+│  → Top 10 chunks        │
+│  → Extract page numbers │
+└────────────┬────────────┘
+             │
+             ▼
+┌─────────────────────────┐
+│  Page Expansion         │
+│  Grab ALL chunks from   │
+│  matched pages          │
+└────────────┬────────────┘
+             │
+             ▼
+┌─────────────────────────┐
+│  Stage 2: TF-IDF Rerank │
+│  Tokenize → TF → IDF   │
+│  → Cosine similarity    │
+│  → Return top 5         │
+└─────────────────────────┘
+```
+
+**Why this works better than grep alone:** Grep finds the right pages (it's good at exact matches). But the best chunk on that page might not contain the exact query terms — it might use synonyms or related terminology. TF-IDF reranking scores every chunk from those pages against the query semantically, surfacing the most relevant content even without exact keyword overlap.
+
+**Why not embeddings:** Embedding APIs add ~200ms latency per query, require an API key, and cost money. TF-IDF over 10-20 chunks takes <5ms and runs locally. For a corpus this size, the quality difference is negligible.
+
+The grep search itself is non-trivial — it supports quoted phrase matching, stem/partial matching ("volt" matches "voltage"), keyword bonuses, section title bonuses, and density normalization (shorter, focused chunks rank higher than long ones with sparse matches).
+
+## Multimodal Response System
+
+### Artifacts (Interactive Components)
+
+When a text answer isn't enough, Claude generates self-contained React components that render in a sandboxed iframe. The sandbox provides React 18, Tailwind CSS, and Lucide icons — no build step required. Claude's code is compiled at runtime via Babel Standalone.
+
+Examples of what the agent generates:
+- **Polarity questions** → SVG connection diagram with material selector (Steel vs Aluminum toggles change the displayed wiring)
+- **Settings questions** → Interactive configurator with dropdowns for process, material, thickness
+- **Duty cycle questions** → Visual calculator showing weld/rest times
+- **Troubleshooting** → Interactive diagnostic flowcharts with clickable yes/no decision trees
+
+The sandbox handles Claude's code patterns (stripping `import`/`export` statements, discovering components by PascalCase name) so artifacts render reliably.
+
+### Troubleshooting Wizards
+
+Pre-built interactive troubleshooting flows for common issues (porosity, wire feed problems, no arc, excessive spatter) render as step-by-step diagnostic trees. For issues without a pre-built flow, Claude generates a custom diagnostic tree on the fly using the `guided_troubleshoot` tool.
+
+### Manual Images
+
+The agent can surface specific images from the manual — polarity diagrams, weld quality reference photos, internal mechanism photos. Images are tagged and searchable, so "show me the TIG polarity setup" finds the right diagram.
+
+## Tools Available to the Agent
+
+| Tool | Purpose |
+|------|---------|
+| `search_manual` | 2-stage retrieval against the knowledge base |
+| `show_manual_image` | Surface tagged manual images |
+| `get_selection_chart_data` | Query structured welding parameters |
+| `get_duty_cycle_data` | Query structured duty cycle data |
+| `render_artifact` | Generate interactive React/SVG/HTML components |
+| `guided_troubleshoot` | Launch interactive diagnostic flowcharts |
+| `web_search` | Search the web for info not in the manual |
+| `update_user_memory` | Persist user preferences across conversations |
+
+## Beyond the Vulcan: Any Product Manual
+
+The system isn't hardcoded to the Vulcan OmniPro 220. Users can:
+
+1. **Upload a PDF** — extracted, chunked, and indexed in-memory with the same 2-stage retrieval
+2. **Paste a product URL** — the web scraper fetches the page, extracts content, and builds a searchable knowledge base
+3. **Preview the document** — full PDF viewer with page navigation and zoom before starting a chat
+
+Uploaded products get the same tool suite (search, artifacts, troubleshooting, web search) with a tailored system prompt.
+
+## Voice & Multilingual Support
+
+- **Voice input** — Browser Speech Recognition API for hands-free questions (useful when your hands are covered in welding flux)
+- **Voice output** — Browser Speech Synthesis with language-matched voices (BCP-47 language tags)
+- **8 languages** — English, Spanish, French, German, Portuguese, Chinese, Japanese, Korean. The UI, system prompts, and responses adapt. Artifacts render with translated labels while keeping code in JavaScript.
+
+## User Memory
+
+The agent learns about users across conversations:
+- **Expertise level** — adjusts language complexity (beginner gets jargon explained, expert gets concise technical answers)
+- **Preferred detail level** — concise vs thorough
+- **Frequent topics** — personalizes suggestions
+- **Custom notes** — remembers context ("works primarily with aluminum", "runs a small fabrication shop")
+
+Memory persists in the browser via localStorage.
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Framework | Next.js 14 (App Router) |
+| AI | Claude Sonnet 4 via Vercel AI SDK (`@ai-sdk/anthropic`) |
+| Streaming | Server-Sent Events (SSE) |
+| Artifacts | Sandboxed iframe + Babel Standalone + React 18 UMD |
+| Styling | Tailwind CSS |
+| PDF Processing | `pdf-parse` (server), `pdfjs-dist` (client viewer) |
+| Web Scraping | `cheerio` for HTML extraction |
+| Voice | Web Speech API (Recognition + Synthesis) |
+
+## Project Structure
+
+```
+src/
+├── app/
+│   ├── api/
+│   │   ├── chat/route.ts           # Main chat endpoint (SSE streaming)
+│   │   ├── upload/route.ts         # PDF upload + extraction
+│   │   ├── search-product/         # Web scraper endpoints
+│   │   ├── session-preview/        # Document preview data
+│   │   └── session-document/       # Serve uploaded PDFs
+│   └── page.tsx                    # Main app page
+├── components/
+│   ├── artifacts/
+│   │   ├── sandbox-iframe.tsx      # Sandboxed artifact renderer
+│   │   ├── artifact-renderer.tsx   # Artifact display wrapper
+│   │   └── image-display.tsx       # Manual image display
+│   └── chat/
+│       ├── chat-container.tsx      # Main chat logic + SSE handling
+│       ├── message-bubble.tsx      # Message rendering (markdown + media)
+│       ├── content-preview.tsx     # PDF viewer for uploaded docs
+│       ├── voice-input-button.tsx  # Speech recognition
+│       └── voice-output-button.tsx # Speech synthesis
+├── hooks/
+│   ├── use-speech-recognition.ts   # Web Speech API wrapper
+│   ├── use-speech-synthesis.ts     # TTS with language support
+│   ├── use-user-memory.ts          # Persistent user preferences
+│   └── use-language.ts             # i18n state management
+├── lib/
+│   ├── semantic-search.ts          # 2-stage retrieval (grep → TF-IDF)
+│   ├── grep-search.ts             # Regex search with scoring
+│   ├── knowledge.ts               # Knowledge base access layer
+│   ├── tools.ts                   # Tool definitions (Vercel AI SDK)
+│   ├── tool-handlers.ts          # Tool execution logic
+│   ├── system-prompt.ts          # System prompts (Vulcan + uploaded products)
+│   ├── troubleshooting-renderer.ts # React code generator for diagnostic flows
+│   ├── web-scraper.ts            # URL content extraction
+│   └── session-store.ts          # In-memory session management
+└── knowledge/
+    ├── text-chunks.json           # Searchable manual text
+    ├── image-catalog.json         # Tagged manual images
+    ├── selection-chart-data.json  # Structured welding parameters
+    ├── duty-cycles.json           # Structured duty cycle data
+    └── troubleshooting/           # Pre-built diagnostic flows
+```
+
+## Design Decisions & Tradeoffs
+
+**Local TF-IDF over external embeddings.** The corpus is small (~200 chunks). TF-IDF + cosine similarity gives good-enough reranking at zero latency and zero cost. If the corpus grew to thousands of documents, embeddings would be worth the tradeoff.
+
+**Pre-structured data over runtime extraction.** Selection charts and duty cycles are extracted once into clean JSON. This means Claude gets exact numbers instead of parsing tables from PDF text. The cost is a one-time preparation step, but the accuracy gain is significant.
+
+**Sandboxed iframes over direct DOM rendering.** Artifacts run in a sandboxed iframe with `allow-scripts` only. This isolates Claude's generated code from the main app — no access to cookies, localStorage, or the parent DOM. Security without sacrificing interactivity.
+
+**SSE over WebSockets.** The chat uses Server-Sent Events, not WebSockets. SSE is simpler, works over standard HTTP, and is sufficient for the unidirectional streaming pattern (server → client). No connection management overhead.
+
+**Browser APIs over cloud services for voice.** Speech recognition and synthesis use the Web Speech API built into browsers. No additional API keys, no per-request costs, no latency. The tradeoff is browser compatibility (works in Chrome/Edge, limited in Firefox/Safari), but for a demo this is the right call.
+
+**Single API key.** The entire system runs on one `ANTHROPIC_API_KEY`. No OpenAI, no Pinecone, no external vector DB. This keeps deployment simple and costs predictable.

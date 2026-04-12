@@ -1,0 +1,128 @@
+{
+  "id": "porosity",
+  "title": "Diagnosing Porosity in Welds",
+  "description": "Step-by-step diagnosis for porosity, gas pockets, and pinholes in welds",
+  "steps": {
+    "start": {
+      "question": "What welding process are you using?",
+      "options": [
+        { "label": "MIG (GMAW)", "next": "mig_gas_check" },
+        { "label": "Flux-Cored (FCAW)", "next": "fc_wind_check" },
+        { "label": "TIG (GTAW)", "next": "tig_gas_check" },
+        { "label": "Stick (SMAW)", "next": "stick_electrode_check" }
+      ]
+    },
+    "mig_gas_check": {
+      "question": "Is your shielding gas flowing? Check the flowmeter on the regulator.",
+      "options": [
+        { "label": "No gas flow at all", "next": "no_gas_flow" },
+        { "label": "Flow seems low or inconsistent", "next": "low_gas_flow" },
+        { "label": "Gas flow looks normal (20-25 CFH)", "next": "mig_contamination" }
+      ]
+    },
+    "no_gas_flow": {
+      "type": "resolution",
+      "title": "No Shielding Gas Flow",
+      "fix": "1. Check that the gas cylinder valve is fully open.\n2. Verify the regulator is set to 20-25 CFH.\n3. Check all gas hose connections for tightness.\n4. Inspect the solenoid valve inside the machine — listen for a click when you pull the trigger.\n5. Check for kinks or damage in the gas hose.",
+      "reference": "See manual page 23 — Gas Setup"
+    },
+    "low_gas_flow": {
+      "type": "resolution",
+      "title": "Low or Inconsistent Gas Flow",
+      "fix": "1. Increase flow rate to 25-30 CFH (higher for outdoor work).\n2. Check for leaks at all fittings with soapy water.\n3. Replace the gas nozzle if it's clogged with spatter.\n4. Check that the gas diffuser isn't blocked.\n5. If cylinder is nearly empty, gas pressure may be insufficient — replace tank.",
+      "reference": "See manual page 23 — Gas Setup"
+    },
+    "mig_contamination": {
+      "question": "Is your workpiece clean? Check for oil, rust, paint, or mill scale.",
+      "options": [
+        { "label": "Surface has contamination", "next": "clean_surface" },
+        { "label": "Surface is clean bare metal", "next": "mig_technique" }
+      ]
+    },
+    "clean_surface": {
+      "type": "resolution",
+      "title": "Surface Contamination",
+      "fix": "1. Grind or wire brush the weld area to bare metal.\n2. Use acetone or a degreaser to remove oil/grease.\n3. Remove all paint, coating, and mill scale in the weld zone.\n4. Clean at least 1 inch beyond the weld area on both sides.\n5. Re-weld on the clean surface.",
+      "reference": "See manual page 15 — Preparation"
+    },
+    "mig_technique": {
+      "question": "Check your technique — are you maintaining proper torch angle and distance?",
+      "options": [
+        { "label": "Gun is too far from workpiece", "next": "fix_stickout" },
+        { "label": "Welding in windy conditions", "next": "fix_wind" },
+        { "label": "Technique seems correct", "next": "check_gas_mix" }
+      ]
+    },
+    "fix_stickout": {
+      "type": "resolution",
+      "title": "Excessive Stickout / Contact Tip Distance",
+      "fix": "1. Maintain 3/8\" to 1/2\" contact tip to work distance (CTWD).\n2. Keep a 15-20° travel angle (push or drag).\n3. Move at a consistent speed — not too fast.\n4. If stickout is too long, gas coverage at the weld pool is lost.",
+      "reference": "See manual page 28 — MIG Welding Technique"
+    },
+    "fix_wind": {
+      "type": "resolution",
+      "title": "Wind Disrupting Gas Coverage",
+      "fix": "1. Set up wind screens or barriers around the work area.\n2. Increase gas flow rate to 30-35 CFH (but not over 40).\n3. Consider switching to flux-cored wire (FCAW) which is self-shielding.\n4. Move work indoors if possible.",
+      "reference": "See manual page 23 — Gas Setup"
+    },
+    "check_gas_mix": {
+      "type": "resolution",
+      "title": "Check Gas Mixture",
+      "fix": "1. Verify you're using the correct gas: 75% Argon / 25% CO2 for mild steel MIG.\n2. 100% CO2 is cheaper but produces more spatter and can cause porosity at high settings.\n3. For aluminum MIG, use 100% Argon.\n4. Check the gas cylinder label — wrong gas is a common shop mistake.\n5. If gas has been sitting unused, purge the line for 5 seconds before welding.",
+      "reference": "See manual page 23 — Shielding Gas"
+    },
+    "fc_wind_check": {
+      "question": "Are you using gas-shielded flux-cored wire (E71T-1) or self-shielded (E71T-11)?",
+      "options": [
+        { "label": "Gas-shielded (E71T-1)", "next": "mig_gas_check" },
+        { "label": "Self-shielded (E71T-11)", "next": "fc_technique" },
+        { "label": "Not sure", "next": "fc_check_wire" }
+      ]
+    },
+    "fc_check_wire": {
+      "type": "resolution",
+      "title": "Identify Your Flux-Cored Wire Type",
+      "fix": "1. Check the wire spool label for the AWS classification.\n2. E71T-11 = self-shielded (no gas needed, uses DCEN polarity).\n3. E71T-1 = gas-shielded (needs 75/25 or 100% CO2).\n4. Using gas-shielded wire without gas causes severe porosity.\n5. Using self-shielded wire with gas can also cause problems.",
+      "reference": "See manual page 19 — Wire Selection"
+    },
+    "fc_technique": {
+      "question": "Check for surface contamination and technique issues.",
+      "options": [
+        { "label": "Dirty or painted surface", "next": "clean_surface" },
+        { "label": "Travel speed might be too fast", "next": "fc_slow_down" },
+        { "label": "Surface is clean, speed is good", "next": "fc_polarity" }
+      ]
+    },
+    "fc_slow_down": {
+      "type": "resolution",
+      "title": "Travel Speed Too Fast",
+      "fix": "1. Slow down your travel speed — the weld pool needs time to degas.\n2. Use a drag (pull) technique for flux-cored welding.\n3. Maintain a 15-45° drag angle.\n4. Watch the weld pool — you should see the slag forming behind the arc.",
+      "reference": "See manual page 30 — Flux-Cored Technique"
+    },
+    "fc_polarity": {
+      "type": "resolution",
+      "title": "Check Polarity Setting",
+      "fix": "1. Self-shielded flux-cored (E71T-11) typically uses DCEN (electrode negative).\n2. Gas-shielded flux-cored (E71T-1) uses DCEP (electrode positive).\n3. Wrong polarity causes poor penetration, porosity, and excessive spatter.\n4. Check your cable connections match the manual's polarity diagram.",
+      "reference": "See manual page 11 — Polarity Setup"
+    },
+    "tig_gas_check": {
+      "question": "Is your argon gas flowing properly? Check post-flow time too.",
+      "options": [
+        { "label": "No gas flow", "next": "no_gas_flow" },
+        { "label": "Gas flow is OK but porosity persists", "next": "tig_technique" }
+      ]
+    },
+    "tig_technique": {
+      "type": "resolution",
+      "title": "TIG Porosity — Technique & Contamination",
+      "fix": "1. Ensure post-flow is set to 8-15 seconds to protect the cooling weld.\n2. Keep the tungsten within 1/4\" of the work.\n3. Don't let the filler rod leave the gas envelope.\n4. Clean the base metal thoroughly — TIG is very sensitive to contamination.\n5. Use only clean, dry filler rod.\n6. Check tungsten for contamination (replace if tip looks balled or discolored).",
+      "reference": "See manual page 32 — TIG Welding"
+    },
+    "stick_electrode_check": {
+      "type": "resolution",
+      "title": "Stick Welding Porosity",
+      "fix": "1. Check electrode condition — wet or damaged electrodes cause porosity.\n2. Store low-hydrogen electrodes (7018) in a rod oven at 250°F.\n3. Use a short arc length (electrode diameter = arc length).\n4. Clean the base metal of rust, oil, and paint.\n5. Use proper travel speed — not too fast.\n6. Check for the correct polarity per electrode type.",
+      "reference": "See manual page 34 — Stick Welding"
+    }
+  }
+}

@@ -1,0 +1,128 @@
+[
+  {
+    "id": "img-product-exterior",
+    "path": "/product.webp",
+    "pageNumber": 1,
+    "description": "Vulcan OmniPro 220 - exterior view showing front panel, LCD display, and controls",
+    "tags": ["product", "exterior", "front panel", "controls", "lcd", "overview", "machine"]
+  },
+  {
+    "id": "img-product-interior",
+    "path": "/product-inside.webp",
+    "pageNumber": 1,
+    "description": "Vulcan OmniPro 220 - interior view showing wire spool, feed mechanism, spindle, spacer, brake pad, wingnut",
+    "tags": ["interior", "wire spool", "feed mechanism", "spindle", "spacer", "brake pad", "wingnut", "setup", "assembly"]
+  },
+  {
+    "id": "img-controls-page",
+    "path": "/api/pdf-page?file=owner-manual&page=8",
+    "pageNumber": 8,
+    "description": "Front panel controls diagram - LCD display, main control knob, process selector, positive and negative sockets",
+    "tags": ["controls", "front panel", "lcd", "knob", "socket", "positive", "negative", "display", "settings"]
+  },
+  {
+    "id": "img-interior-controls-page",
+    "path": "/api/pdf-page?file=owner-manual&page=9",
+    "pageNumber": 9,
+    "description": "Interior controls - wire spool area, feed roller, tension knob",
+    "tags": ["interior", "controls", "wire spool", "feed roller", "tension"]
+  },
+  {
+    "id": "img-wire-spool-page",
+    "path": "/api/pdf-page?file=owner-manual&page=11",
+    "pageNumber": 11,
+    "description": "Wire spool installation - spindle, spacer, brake pad, wingnut assembly for both 1-2 lb and 10-12 lb spools",
+    "tags": ["wire spool", "spindle", "spacer", "brake pad", "wingnut", "installation", "setup", "spool"]
+  },
+  {
+    "id": "img-feed-roller-page",
+    "path": "/api/pdf-page?file=owner-manual&page=12",
+    "pageNumber": 12,
+    "description": "Feed roller setup - correct groove selection for wire type, tension adjustment knob",
+    "tags": ["feed roller", "groove", "tension", "wire feed", "knob", "adjustment"]
+  },
+  {
+    "id": "img-polarity-dcep-page",
+    "path": "/api/pdf-page?file=owner-manual&page=14",
+    "pageNumber": 14,
+    "description": "DCEP polarity setup for solid core MIG welding - MIG gun in positive (+) socket, ground clamp in negative (-) socket",
+    "tags": ["polarity", "dcep", "mig", "solid core", "positive", "negative", "socket", "connection", "cable", "setup"]
+  },
+  {
+    "id": "img-polarity-dcen-page",
+    "path": "/api/pdf-page?file=owner-manual&page=15",
+    "pageNumber": 15,
+    "description": "DCEN polarity setup for flux-cored welding and TIG - gun/torch in negative (-) socket, ground clamp in positive (+) socket",
+    "tags": ["polarity", "dcen", "flux-cored", "tig", "negative", "positive", "socket", "connection", "cable", "setup"]
+  },
+  {
+    "id": "img-polarity-tig-page",
+    "path": "/api/pdf-page?file=owner-manual&page=25",
+    "pageNumber": 25,
+    "description": "TIG welding polarity and setup - DCEN: TIG torch in negative (-) socket, ground clamp in positive (+) socket",
+    "tags": ["polarity", "tig", "dcen", "torch", "negative", "positive", "socket", "connection", "ground clamp", "setup"]
+  },
+  {
+    "id": "img-polarity-stick-page",
+    "path": "/api/pdf-page?file=owner-manual&page=32",
+    "pageNumber": 32,
+    "description": "Stick welding polarity setup - DCEP: electrode holder in positive (+) socket, ground clamp in negative (-) socket",
+    "tags": ["polarity", "stick", "dcep", "electrode", "holder", "positive", "negative", "socket", "connection", "setup"]
+  },
+  {
+    "id": "img-gas-setup-page",
+    "path": "/api/pdf-page?file=owner-manual&page=17",
+    "pageNumber": 17,
+    "description": "Gas regulator and hose connection setup for MIG welding",
+    "tags": ["gas", "regulator", "flowmeter", "hose", "connection", "mig", "setup", "shielding gas"]
+  },
+  {
+    "id": "img-weld-diagnosis-page",
+    "path": "/api/pdf-page?file=owner-manual&page=35",
+    "pageNumber": 35,
+    "description": "Weld bead diagnosis chart - examples of good weld, porosity, spatter, burn-through, crooked beads, slag, poor adhesion",
+    "tags": ["weld", "diagnosis", "porosity", "spatter", "burn-through", "slag", "bead", "quality", "troubleshooting", "defect"]
+  },
+  {
+    "id": "img-specs-page",
+    "path": "/api/pdf-page?file=owner-manual&page=7",
+    "pageNumber": 7,
+    "description": "Specifications and duty cycle ratings - input voltage, output ranges, duty cycles for all processes at 120V and 240V",
+    "tags": ["specifications", "duty cycle", "voltage", "amperage", "rating", "specs", "120v", "240v"]
+  },
+  {
+    "id": "img-troubleshooting-page",
+    "path": "/api/pdf-page?file=owner-manual&page=43",
+    "pageNumber": 43,
+    "description": "Troubleshooting matrix - common problems, possible causes, and solutions",
+    "tags": ["troubleshooting", "problems", "causes", "solutions", "fix", "repair", "issue"]
+  },
+  {
+    "id": "img-troubleshooting-page-2",
+    "path": "/api/pdf-page?file=owner-manual&page=44",
+    "pageNumber": 44,
+    "description": "Troubleshooting matrix continued - additional welding problems and solutions",
+    "tags": ["troubleshooting", "problems", "causes", "solutions", "fix", "repair"]
+  },
+  {
+    "id": "img-wiring-schematic-page",
+    "path": "/api/pdf-page?file=owner-manual&page=45",
+    "pageNumber": 45,
+    "description": "Wiring schematic - complete electrical diagram with transformer, IGBT, rectifier, fans, MCU",
+    "tags": ["wiring", "schematic", "electrical", "diagram", "transformer", "igbt", "rectifier", "circuit"]
+  },
+  {
+    "id": "img-parts-page",
+    "path": "/api/pdf-page?file=owner-manual&page=47",
+    "pageNumber": 47,
+    "description": "Parts assembly diagram - numbered exploded view of all components",
+    "tags": ["parts", "assembly", "diagram", "exploded view", "components", "replacement"]
+  },
+  {
+    "id": "img-selection-chart",
+    "path": "/api/pdf-page?file=selection-chart&page=1",
+    "pageNumber": 1,
+    "description": "Welding process selection chart - recommended settings by process, material, and thickness",
+    "tags": ["selection chart", "settings", "process", "material", "thickness", "wire speed", "voltage", "amperage"]
+  }
+]

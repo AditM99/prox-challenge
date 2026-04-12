@@ -1,0 +1,94 @@
+{
+  "id": "wire-feed-issues",
+  "title": "Wire Feed Problems",
+  "description": "Diagnose and fix wire feed issues including bird-nesting, jamming, and inconsistent feeding",
+  "steps": {
+    "start": {
+      "question": "What best describes your wire feed problem?",
+      "options": [
+        { "label": "Wire won't feed at all", "next": "no_feed" },
+        { "label": "Wire feeds but is erratic/inconsistent", "next": "erratic_feed" },
+        { "label": "Wire tangles inside (bird-nesting)", "next": "bird_nest" },
+        { "label": "Wire burns back to the contact tip", "next": "burnback" }
+      ]
+    },
+    "no_feed": {
+      "question": "Is the drive roll turning when you press the trigger?",
+      "options": [
+        { "label": "Drive roll is not turning", "next": "drive_not_spinning" },
+        { "label": "Drive roll spins but wire doesn't move", "next": "drive_slipping" }
+      ]
+    },
+    "drive_not_spinning": {
+      "type": "resolution",
+      "title": "Drive Motor / Electrical Issue",
+      "fix": "1. Check that the machine is powered on and the process is set to MIG/Flux-Cored.\n2. Verify the trigger switch on the gun is working (listen for relay click).\n3. Check the wire feed speed knob — it may be set to zero.\n4. Inspect the motor connection inside the wire compartment.\n5. If the motor still won't spin, the drive motor or circuit board may need service.",
+      "reference": "See manual page 21 — Wire Feed System"
+    },
+    "drive_slipping": {
+      "question": "Check the drive roll setup.",
+      "options": [
+        { "label": "Tension seems loose", "next": "fix_tension" },
+        { "label": "Wrong drive roll groove size", "next": "fix_drive_roll" },
+        { "label": "Tension is correct, roll looks right", "next": "check_liner" }
+      ]
+    },
+    "fix_tension": {
+      "type": "resolution",
+      "title": "Drive Roll Tension Too Low",
+      "fix": "1. Increase drive roll tension gradually — turn the tension knob clockwise.\n2. The wire should feed smoothly without slipping.\n3. Don't overtighten — this deforms the wire and causes feed issues downstream.\n4. Test: wire should push out with moderate resistance when gun trigger is held.\n5. If using aluminum wire, use U-groove rolls and lighter tension.",
+      "reference": "See manual page 21 — Drive Roll Tension"
+    },
+    "fix_drive_roll": {
+      "type": "resolution",
+      "title": "Wrong Drive Roll Size",
+      "fix": "1. Match the drive roll groove to your wire diameter.\n2. Common sizes: 0.030\" and 0.035\" for steel MIG wire.\n3. The groove size is stamped on the drive roll — rotate it to check both sides.\n4. Use V-groove for solid wire, knurled for flux-cored wire.\n5. For aluminum, use U-groove rolls to avoid crushing the soft wire.",
+      "reference": "See manual page 20 — Drive Roll Selection"
+    },
+    "check_liner": {
+      "type": "resolution",
+      "title": "Liner Obstruction",
+      "fix": "1. Remove the contact tip and gas nozzle from the gun.\n2. Try feeding wire through — if it's still stuck, the liner is blocked.\n3. Disconnect the gun cable and pull the liner out.\n4. Replace the liner if it's kinked, crushed, or packed with debris.\n5. Match liner size to wire size: steel liner for steel wire, Teflon for aluminum.\n6. Cut liner to correct length — too short leaves a gap, too long compresses.",
+      "reference": "See manual page 22 — Gun Liner"
+    },
+    "erratic_feed": {
+      "question": "When does the erratic feeding happen?",
+      "options": [
+        { "label": "Starts fine then gets worse", "next": "contact_tip_wear" },
+        { "label": "Inconsistent from the start", "next": "drive_slipping" },
+        { "label": "Happens only at certain wire speeds", "next": "voltage_mismatch" }
+      ]
+    },
+    "contact_tip_wear": {
+      "type": "resolution",
+      "title": "Worn Contact Tip",
+      "fix": "1. Remove and inspect the contact tip — look for an elongated or oval hole.\n2. Replace the contact tip if the hole is visibly larger than the wire diameter.\n3. Contact tips are consumables — replace them regularly.\n4. Use the correct tip size for your wire (0.030\" tip for 0.030\" wire).\n5. Anti-spatter spray on the nozzle can extend tip life.",
+      "reference": "See manual page 22 — Contact Tips"
+    },
+    "voltage_mismatch": {
+      "type": "resolution",
+      "title": "Wire Speed / Voltage Mismatch",
+      "fix": "1. If wire speed is too high for the voltage, the wire can't melt fast enough.\n2. Use the selection chart to find the correct voltage + wire speed combination.\n3. Increase voltage or decrease wire speed until you get a smooth arc.\n4. Listen for a steady buzzing/frying sound — that's a good arc.\n5. A popping/stuttering sound means the settings need adjustment.",
+      "reference": "See manual Selection Chart"
+    },
+    "bird_nest": {
+      "question": "Where is the wire tangling?",
+      "options": [
+        { "label": "At the drive rolls", "next": "bird_nest_drive" },
+        { "label": "Inside the gun cable", "next": "check_liner" }
+      ]
+    },
+    "bird_nest_drive": {
+      "type": "resolution",
+      "title": "Bird-Nesting at Drive Rolls",
+      "fix": "1. Cut and remove the tangled wire.\n2. This is usually caused by a blockage downstream (liner or tip).\n3. Check the contact tip — replace if worn or clogged.\n4. Check the liner — replace if kinked or obstructed.\n5. Reduce drive roll tension slightly — over-tension forces wire into blockages.\n6. Ensure the gun cable isn't sharply bent (max 12\" radius curve).",
+      "reference": "See manual page 21 — Wire Feed Troubleshooting"
+    },
+    "burnback": {
+      "type": "resolution",
+      "title": "Wire Burns Back to Contact Tip",
+      "fix": "1. Increase wire feed speed — the wire isn't feeding fast enough to sustain the arc.\n2. Check that the contact tip isn't fused — replace it if wire is welded to it.\n3. Make sure you're not holding the trigger before touching the workpiece.\n4. Reduce voltage if wire speed is already at maximum for your material.\n5. Ensure proper work clamp connection — poor ground causes arc instability.",
+      "reference": "See manual page 28 — MIG Technique"
+    }
+  }
+}
