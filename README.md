@@ -49,37 +49,37 @@ User Question
      └───────────────┘
 ```
 
-The system streams responses via Server-Sent Events (SSE). Claude calls tools as it reasons, and each tool result (text, images, artifacts) is emitted as a separate SSE event. The frontend renders them in real-time — text streams in, images appear as they're found, artifacts render in sandboxed iframes.
+The system streams responses via Server Sent Events (SSE). Claude calls tools as it reasons, and each tool result (text, images, artifacts) is emitted as a separate SSE event. The frontend renders them in realt ime — text streams in, images appear as they're found, artifacts render in sandboxed iframes.
 
 ## Knowledge Extraction & Representation
 
 ### How the Manual Becomes Searchable
 
-The 48-page PDF is pre-processed into four structured knowledge layers:
+The 48 page PDF is pre-processed into four structured knowledge layers:
 
 | Layer                | File                                  | What it contains                                                                                                    |
 | -------------------- | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
 | **Text chunks**      | `knowledge/text-chunks.json`          | Every page split into semantic sections with keywords extracted per chunk                                           |
 | **Image catalog**    | `knowledge/image-catalog.json`        | Manual images tagged with descriptions and searchable metadata (polarity diagrams, weld quality photos, schematics) |
-| **Selection charts** | `knowledge/selection-chart-data.json` | Structured welding parameter data — process, material, thickness → wire, gas, voltage, wire speed                   |
-| **Duty cycles**      | `knowledge/duty-cycles.json`          | Structured duty cycle matrices — process, input voltage → rated amps, duty cycle %, continuous amps                 |
+| **Selection charts** | `knowledge/selection-chart-data.json` | Structured welding parameter data: process, material, thickness → wire, gas, voltage, wire speed                    |
+| **Duty cycles**      | `knowledge/duty-cycles.json`          | Structured duty cycle matrices: process, input voltage → rated amps, duty cycle %, continuous amps                  |
 
-Pre-processing runs once via `npm run prepare-knowledge`. The structured data means Claude doesn't have to parse tables from raw PDF text at query time — it gets clean, queryable data.
+Pre-processing runs once via `npm run prepare-knowledge`. The structured data means Claude doesn't have to parse tables from raw PDF text at query time itgets clean, queryable data.
 
 ### Why This Structure
 
-Separating structured data (selection charts, duty cycles) from free text was a deliberate choice. When someone asks "What settings for 1/8 inch mild steel MIG?", the agent queries the selection chart directly and gets exact numbers. If that same data lived in a text chunk, the model would have to extract values from prose — slower, less reliable, and prone to hallucination.
+Separating structured data (selection charts, duty cycles) from free text was a deliberate choice. When someone asks "What settings for 1/8 inch mild steel MIG?", the agent queries the selection chart directly and gets exact numbers. If that same data lived in a text chunk, the model would have to extract values from prose which is slower, less reliable, and prone to hallucination.
 
 The image catalog with semantic tags means the agent can find "the polarity diagram for TIG" without doing image recognition at query time. The tags were created during knowledge preparation, not at runtime.
 
-## 2-Stage Retrieval: Grep → TF-IDF Rerank
+## 2 Stage Retrieval: Grep → TF-IDF Rerank
 
-This was the most important design decision. Pure keyword search misses conversational queries ("how do I fix spatter" won't match "excessive spatter can be reduced by adjusting voltage"). But embedding-based search adds latency, cost, and an external API dependency.
+This was the most important design decision. Pure keyword search misses conversational queries ("how do I fix spatter" won't match "excessive spatter can be reduced by adjusting voltage"). But embedding based search adds latency, cost, and an external API dependency.
 
 The solution is a two-stage pipeline that runs entirely in-process:
 
 ```
-Query: "how do I fix spatter"
+Query: "how do I fix spatter"-
          │
          ▼
 ┌─────────────────────────┐
@@ -105,17 +105,17 @@ Query: "how do I fix spatter"
 └─────────────────────────┘
 ```
 
-**Why this works better than grep alone:** Grep finds the right pages (it's good at exact matches). But the best chunk on that page might not contain the exact query terms — it might use synonyms or related terminology. TF-IDF reranking scores every chunk from those pages against the query semantically, surfacing the most relevant content even without exact keyword overlap.
+**Why this works better than grep alone:** Grep finds the right pages (it's good at exact matches). But the best chunk on that page might not contain the exact query terms it might use synonyms or related terminology. TF-IDF reranking scores every chunk from those pages against the query semantically, surfacing the most relevant content even without exact keyword overlap.
 
 **Why not embeddings:** Embedding APIs add ~200ms latency per query, require an API key, and cost money. TF-IDF over 10-20 chunks takes <5ms and runs locally. For a corpus this size, the quality difference is negligible.
 
-The grep search itself is non-trivial — it supports quoted phrase matching, stem/partial matching ("volt" matches "voltage"), keyword bonuses, section title bonuses, and density normalization (shorter, focused chunks rank higher than long ones with sparse matches).
+The grep search itself is nonbtrivial, it supports quoted phrase matching, stem/partial matching ("volt" matches "voltage"), keyword bonuses, section title bonuses, and density normalization (shorter, focused chunks rank higher than long ones with sparse matches).
 
 ## Multimodal Response System
 
 ### Artifacts (Interactive Components)
 
-When a text answer isn't enough, Claude generates self-contained React components that render in a sandboxed iframe. The sandbox provides React 18, Tailwind CSS, and Lucide icons — no build step required. Claude's code is compiled at runtime via Babel Standalone.
+When a text answer isn't enough, Claude generates selfbcontained React components that render in a sandboxed iframe. The sandbox provides React 18, Tailwind CSS, and Lucide icons no build step required. Claude's code is compiled at runtime via Babel Standalone.
 
 Examples of what the agent generates:
 
@@ -128,17 +128,17 @@ The sandbox handles Claude's code patterns (stripping `import`/`export` statemen
 
 ### Troubleshooting Wizards
 
-Pre-built interactive troubleshooting flows for common issues (porosity, wire feed problems, no arc, excessive spatter) render as step-by-step diagnostic trees. For issues without a pre-built flow, Claude generates a custom diagnostic tree on the fly using the `guided_troubleshoot` tool.
+Pre built interactive troubleshooting flows for common issues (porosity, wire feed problems, no arc, excessive spatter) render as step by step diagnostic trees. For issues without a pre built flow, Claude generates a custom diagnostic tree on the fly using the `guided_troubleshoot` tool.
 
 ### Manual Images
 
-The agent can surface specific images from the manual — polarity diagrams, weld quality reference photos, internal mechanism photos. Images are tagged and searchable, so "show me the TIG polarity setup" finds the right diagram.
+The agent can surface specific images from the manual, polarity diagrams, weld quality reference photos, internal mechanism photos. Images are tagged and searchable, so "show me the TIG polarity setup" finds the right diagram.
 
 ## Tools Available to the Agent
 
 | Tool                       | Purpose                                        |
 | -------------------------- | ---------------------------------------------- |
-| `search_manual`            | 2-stage retrieval against the knowledge base   |
+| `search_manual`            | 2 stage retrieval against the knowledge base   |
 | `show_manual_image`        | Surface tagged manual images                   |
 | `get_selection_chart_data` | Query structured welding parameters            |
 | `get_duty_cycle_data`      | Query structured duty cycle data               |
@@ -151,16 +151,24 @@ The agent can surface specific images from the manual — polarity diagrams, wel
 
 The system isn't hardcoded to the Vulcan OmniPro 220. Users can:
 
-1. **Upload a PDF** — extracted, chunked, and indexed in-memory with the same 2-stage retrieval
+1. **Upload a PDF** — extracted, chunked, and indexed in-memory with the same 2 stage retrieval
 2. **Paste a product URL** — the web scraper fetches the page, extracts content, and builds a searchable knowledge base
 3. **Preview the document** — full PDF viewer with page navigation and zoom before starting a chat
 
 Uploaded products get the same tool suite (search, artifacts, troubleshooting, web search) with a tailored system prompt.
 
+## Image Input in Chat
+
+Users can attach photos directly in the chat snap a picture of a weld bead, machine panel, error indicator, or wire feed issue and ask "what's wrong?" Claude analyzes the image using its vision capabilities alongside the manual knowledge base, enabling visual troubleshooting that text alone can't match.
+
+- Attach multiple images per message (up to 5MB each)
+- Images display inline in the conversation
+- Works alongside text input — describe what you see while showing the photo
+
 ## Voice & Multilingual Support
 
-- **Voice input** — Browser Speech Recognition API for hands-free questions (useful when your hands are covered in welding flux)
-- **Voice output** — Browser Speech Synthesis with language-matched voices (BCP-47 language tags)
+- **Voice input** — Browser Speech Recognition API for hands free questions (useful when your hands are covered in welding flux)
+- **Voice output** — Browser Speech Synthesis with language matched voices (BCP 47 language tags)
 - **8 languages** — English, Spanish, French, German, Portuguese, Chinese, Japanese, Korean. The UI, system prompts, and responses adapt. Artifacts render with translated labels while keeping code in JavaScript.
 
 ## User Memory
@@ -237,12 +245,16 @@ src/
 
 **Local TF-IDF over external embeddings.** The corpus is small (~200 chunks). TF-IDF + cosine similarity gives good-enough reranking at zero latency and zero cost. If the corpus grew to thousands of documents, embeddings would be worth the tradeoff.
 
-**Pre-structured data over runtime extraction.** Selection charts and duty cycles are extracted once into clean JSON. This means Claude gets exact numbers instead of parsing tables from PDF text. The cost is a one-time preparation step, but the accuracy gain is significant.
+**Pre-structured data over runtime extraction.** Selection charts and duty cycles are extracted once into clean JSON. This means Claude gets exact numbers instead of parsing tables from PDF text. The cost is a one time preparation step, but the accuracy gain is significant.
 
-**Sandboxed iframes over direct DOM rendering.** Artifacts run in a sandboxed iframe with `allow-scripts` only. This isolates Claude's generated code from the main app — no access to cookies, localStorage, or the parent DOM. Security without sacrificing interactivity.
+**Sandboxed iframes over direct DOM rendering.** Artifacts run in a sandboxed iframe with `allow-scripts` only. This isolates Claude's generated code from the main app, no access to cookies, localStorage, or the parent DOM. Security without sacrificing interactivity.
 
 **SSE over WebSockets.** The chat uses Server-Sent Events, not WebSockets. SSE is simpler, works over standard HTTP, and is sufficient for the unidirectional streaming pattern (server → client). No connection management overhead.
 
-**Browser APIs over cloud services for voice.** Speech recognition and synthesis use the Web Speech API built into browsers. No additional API keys, no per-request costs, no latency. The tradeoff is browser compatibility (works in Chrome/Edge, limited in Firefox/Safari), but for a demo this is the right call.
+**Browser APIs over cloud services for voice.** Speech recognition and synthesis use the Web Speech API built into browsers. No additional API keys, no per request costs, no latency. The tradeoff is browser compatibility (works in Chrome/Edge, limited in Firefox/Safari), but for a demo this is the right call.
 
 **Single API key.** The entire system runs on one `ANTHROPIC_API_KEY`. No OpenAI, no Pinecone, no external vector DB. This keeps deployment simple and costs predictable.
+
+## Live Demo
+
+**[https://prox-challenge-five.vercel.app/](https://prox-challenge-five.vercel.app/)**
