@@ -40,6 +40,7 @@ export interface ChatMessage {
   content: string;
   images?: { url: string; description: string; pageNumber?: number }[];
   artifacts?: { type: string; title: string; code: string }[];
+  attachedImages?: { base64: string; mimeType: string }[];
   isStreaming?: boolean;
 }
 

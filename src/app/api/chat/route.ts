@@ -26,10 +26,23 @@ export async function POST(req: NextRequest) {
   const tools = session ? getUploadedProductTools(session) : getDefaultTools();
 
   const apiMessages: ModelMessage[] = clientMessages.map(
-    (msg: { role: string; content: string }) => ({
-      role: msg.role as "user" | "assistant",
-      content: msg.content,
-    })
+    (msg: { role: string; content: string; attachedImages?: { base64: string; mimeType: string }[] }) => {
+      // If the message has attached images, use multipart content
+      if (msg.attachedImages && msg.attachedImages.length > 0 && msg.role === "user") {
+        const parts: Array<{ type: "text"; text: string } | { type: "image"; image: string; mimeType: string }> = [];
+        for (const img of msg.attachedImages) {
+          parts.push({ type: "image", image: img.base64, mimeType: img.mimeType });
+        }
+        if (msg.content) {
+          parts.push({ type: "text", text: msg.content });
+        }
+        return { role: "user" as const, content: parts };
+      }
+      return {
+        role: msg.role as "user" | "assistant",
+        content: msg.content,
+      };
+    }
   );
 
   const stream = new ReadableStream({

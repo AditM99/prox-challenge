@@ -37,7 +37,19 @@ export default function MessageBubble({ message, language = "en" }: MessageBubbl
       <div className={`flex-1 max-w-[85%] ${isUser ? "text-right" : ""}`}>
         {isUser ? (
           <div className="inline-block bg-brand-600/20 text-white border border-brand-500/15 rounded-2xl rounded-tr-sm px-4 py-2.5">
-            <p className="text-sm">{message.content}</p>
+            {message.attachedImages && message.attachedImages.length > 0 && (
+              <div className="flex gap-2 mb-2 flex-wrap justify-end">
+                {message.attachedImages.map((img, i) => (
+                  <img
+                    key={i}
+                    src={`data:${img.mimeType};base64,${img.base64}`}
+                    alt="Attached"
+                    className="max-w-[200px] max-h-[200px] object-cover rounded-lg"
+                  />
+                ))}
+              </div>
+            )}
+            {message.content && <p className="text-sm">{message.content}</p>}
           </div>
         ) : (
           <div className="space-y-2">

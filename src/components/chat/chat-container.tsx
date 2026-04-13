@@ -26,6 +26,8 @@ import {
   Zap,
   Languages,
   Menu,
+  ImagePlus,
+  X,
 } from "lucide-react";
 
 const DEFAULT_PRODUCT = {
@@ -71,8 +73,10 @@ export default function ChatContainer() {
   } = useChatSessions();
   const [showLangMenu, setShowLangMenu] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [pendingImages, setPendingImages] = useState<{ base64: string; mimeType: string; preview: string }[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
   const sendingRef = useRef(false);
 
   const scrollToBottom = useCallback(() => {
@@ -102,12 +106,43 @@ export default function ChatContainer() {
     setActiveSessionId(null);
   };
 
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+
+    Array.from(files).forEach((file) => {
+      if (!file.type.startsWith("image/")) return;
+      if (file.size > 5 * 1024 * 1024) return; // 5MB limit
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        const dataUrl = reader.result as string;
+        const base64 = dataUrl.split(",")[1];
+        setPendingImages((prev) => [
+          ...prev,
+          { base64, mimeType: file.type, preview: dataUrl },
+        ]);
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Reset input so same file can be selected again
+    e.target.value = "";
+  };
+
+  const removePendingImage = (index: number) => {
+    setPendingImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
   const handleSend = async (text?: string) => {
     const messageText = text || input.trim();
-    if (!messageText || isLoading || !activeProduct || sendingRef.current) return;
+    const hasImages = pendingImages.length > 0;
+    if ((!messageText && !hasImages) || isLoading || !activeProduct || sendingRef.current) return;
 
     sendingRef.current = true;
+    const imagesToSend = [...pendingImages];
     setInput("");
+    setPendingImages([]);
     setIsLoading(true);
     setToolStatus(null);
     incrementInteractionCount();
@@ -115,7 +150,10 @@ export default function ChatContainer() {
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
       role: "user",
-      content: messageText,
+      content: messageText || "What do you see in this image?",
+      attachedImages: imagesToSend.length > 0
+        ? imagesToSend.map((img) => ({ base64: img.base64, mimeType: img.mimeType }))
+        : undefined,
     };
 
     const assistantMessage: ChatMessage = {
@@ -133,6 +171,7 @@ export default function ChatContainer() {
       const apiMessages = [...messages, userMessage].map((m) => ({
         role: m.role,
         content: m.content,
+        attachedImages: m.attachedImages,
       }));
 
       const response = await fetch("/api/chat", {
@@ -511,7 +550,43 @@ export default function ChatContainer() {
       {/* Input bar */}
       <div className="flex-shrink-0 glass border-t border-white/[0.06] px-4 sm:px-6 py-4">
         <div className="max-w-3xl mx-auto">
+          {/* Pending image previews */}
+          {pendingImages.length > 0 && (
+            <div className="flex gap-2 mb-2 flex-wrap">
+              {pendingImages.map((img, i) => (
+                <div key={i} className="relative group">
+                  <img
+                    src={img.preview}
+                    alt="Attached"
+                    className="w-16 h-16 object-cover rounded-lg border border-white/10"
+                  />
+                  <button
+                    onClick={() => removePendingImage(i)}
+                    className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <X className="w-3 h-3 text-white" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
           <div className="flex gap-2 items-end">
+            <button
+              onClick={() => imageInputRef.current?.click()}
+              disabled={isLoading}
+              title="Attach image"
+              className="bg-white/5 text-white/40 hover:text-white/60 hover:bg-white/10 border border-white/10 rounded-xl p-3 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              <ImagePlus className="w-4 h-4" />
+            </button>
+            <input
+              ref={imageInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleImageSelect}
+              className="hidden"
+            />
             <textarea
               ref={inputRef}
               value={input}
@@ -531,7 +606,7 @@ export default function ChatContainer() {
             />
             <button
               onClick={() => handleSend()}
-              disabled={!input.trim() || isLoading}
+              disabled={(!input.trim() && pendingImages.length === 0) || isLoading}
               className="bg-brand-600 hover:bg-brand-500 disabled:bg-white/5 disabled:text-white/20 text-white rounded-xl p-3 transition-all shadow-lg shadow-brand-600/20 hover:shadow-brand-500/30 disabled:shadow-none"
             >
               <Send className="w-4 h-4" />
